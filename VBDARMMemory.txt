@@ -1,0 +1,106 @@
+
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: DLSU Manila
+// Engineer: Voltaire B. Dupo, ECE, MSc. ECE
+// 
+// Create Date: 17.10.2023 14:32:15
+// Design Name: VBDARM Processor Component 1 of 1
+// Module Name: RAM Module for VBDARM
+// Project Name: Virtual ARM RISC Processor Project
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+module Memory(addr, data_in, data_out, wr_en, clk,R0,R1,R2,R4,PC,CPC,rst,datacee,ambain,literal,csrc);
+
+input [4:0] addr;
+input [7:0] data_in;
+input [7:0] datacee;
+input [7:0] ambain;
+input [7:0] literal;
+input [1:0] csrc;
+output [7:0] data_out;
+output [7:0] R0;
+output [7:0] R1;
+output [7:0] R2;
+output [7:0] R4;
+output [7:0] PC;
+input wr_en, clk;
+input CPC; // Control for Program Counter if CPC = 1 then PC++ if CPC =0  PC=PC
+input rst;
+
+reg [7:0] Mem[0:31];
+reg [7:0] internal_bus;
+reg [7:0] REG0;
+reg [7:0] REG1;
+reg [7:0] REG2;
+reg [7:0] REG4;
+reg [7:0] PCREG;
+
+
+initial internal_bus = Mem[addr];	// initialize what's at the output
+
+always@(negedge rst)
+begin
+   Mem[8'h0C] = 8'h00;   // Clears PC
+   Mem[8'h00] = 8'h00;
+   Mem[8'h01] = 8'h00;
+   Mem[8'h02] = 8'h00;
+   Mem[8'h03] = 8'h00;
+   Mem[8'h04] = 8'h00;
+   Mem[8'h05] = 8'h00;
+   Mem[8'h06] = 8'h00;
+   Mem[8'h07] = 8'h00;
+   Mem[8'h08] = 8'h00;
+end
+
+always @addr
+         begin 
+          internal_bus = Mem[addr];	// update what's at the output
+          REG0 = Mem[5'h00]; // Update the Output for R0
+          REG1 = Mem[5'h01]; // Update the Output for R1
+          REG2 = Mem[5'h02]; // Update the Output for R2
+          REG4 = Mem[5'h04]; // Update the Output for R4
+          PCREG = Mem[5'h0C]; // Update the Output for PC
+       end 
+       
+always @(posedge clk)
+   if (wr_en == 1) 
+   begin
+       case(csrc)
+        2'b00: Mem[addr] = data_in;
+        2'b01: Mem[addr] = literal;
+        2'b10: Mem[addr] = ambain;
+        2'b11: Mem[addr] = datacee;           
+       endcase
+	   internal_bus = Mem[addr]; 	// update what's at the output
+	   if(CPC)                 
+           begin
+           PCREG=Mem[5'h0C];
+           Mem[5'h0C]=PCREG+1'b1;  // PC<- PC+1
+           PCREG=Mem[5'h0C];
+           end
+         REG0 = Mem[5'h00]; // Update the Output for R0
+         REG1 = Mem[5'h01]; // Update the Output for R1
+         REG2 = Mem[5'h02]; // Update the Output for R2
+         REG4 = Mem[5'h04]; // Update the Output for R4
+         PCREG = Mem[5'h0C]; // Update the Output for PC   
+	end
+
+assign data_out = internal_bus;
+assign R0 = REG0;
+assign R1 = REG1;
+assign R2 = REG2;
+assign R4 = REG4;
+assign PC = PCREG; 
+
+endmodule
