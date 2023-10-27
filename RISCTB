@@ -1,0 +1,73 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: DLSU Manila
+// Engineer: Voltaire B. Dupo
+// 
+// Create Date: 25.10.2023 08:26:44
+// Design Name:  RISC TB
+// Module Name: armtb
+// Project Name: RISC Processor
+// Target Devices: 
+// Tool Versions: Vivado 2018.1
+// Description: This contains a rudimentary processor consiting 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module armtb;
+
+reg rsttb;
+reg [7:0] Literaltb;
+reg [5:0] Addrtb;
+reg [7:0] dataintb;
+reg [7:0] AMBItb;
+reg wr_entb;
+reg clktb;
+reg [5:0] calutb;
+reg cpctb;
+reg [1:0] csrctb;
+wire [7:0] dataouttb;
+wire [7:0] R0tb;
+wire [7:0] R4tb;
+wire [7:0] PCtb;
+wire [7:0] muxouttb;
+wire [7:0] R1tb;
+wire [7:0] R2tb;
+wire [7:0] CEEtb;
+
+ARM UUT (rsttb, Literaltb,Addrtb,dataintb,AMBItb,wr_entb,clktb,calutb,cpctb,csrctb,dataouttb,R0tb,R4tb,PCtb,muxouttb,R1tb,R2tb,CEEtb);
+
+initial 
+begin
+clktb=1'b0;
+rsttb=1'b0;
+#5 rsttb=1'b1; Literaltb=8'h00; Addrtb=8'h03; calutb=8'h00; csrctb=2'h1; wr_entb=1'b1; cpctb=1'b1; dataintb=8'h11; AMBItb=8'h33;
+#5 csrctb=2'h0;
+#5 csrctb=2'h1;
+#5 csrctb=2'h2;
+#5 csrctb=2'h3;
+end
+
+always #5 clktb=~clktb;
+
+initial
+begin
+#40	Literaltb=8'h00; Addrtb=8'h01; calutb=8'h00; csrctb=2'h0; wr_entb=1'b1; cpctb=1'b0;
+#10	Literaltb=8'h2B; Addrtb=8'h02; calutb=8'h00; csrctb=2'h1; wr_entb=1'b1; cpctb=1'b1;
+#10	Literaltb=8'h42; Addrtb=8'h04; calutb=8'h00; csrctb=2'h1; wr_entb=1'b1; cpctb=1'b1;
+#10	Literaltb=8'hA2; Addrtb=8'h0C; calutb=8'h00; csrctb=2'h1; wr_entb=1'b1; cpctb=1'b0;
+#10	Literaltb=8'h00; Addrtb=8'h01; calutb=8'h01; csrctb=2'h3; wr_entb=1'b1; cpctb=1'b1;
+#10	Literaltb=8'h00; Addrtb=8'h01; calutb=8'h01; csrctb=2'h3; wr_entb=1'b1; cpctb=1'b1;
+#10	Literaltb=8'h00; Addrtb=8'h01; calutb=8'h01; csrctb=2'h3; wr_entb=1'b1; cpctb=1'b1;
+#10	Literaltb=8'h00; Addrtb=8'h01; calutb=8'h02; csrctb=2'h3; wr_entb=1'b1; cpctb=1'b1;
+#10	Literaltb=8'h00; Addrtb=8'h01; calutb=8'h02; csrctb=2'h3; wr_entb=1'b1; cpctb=1'b1;
+#10	Literaltb=8'h00; Addrtb=8'h04; calutb=8'h00; csrctb=2'h3; wr_entb=1'b1; cpctb=1'b1;
+end
+
+endmodule
